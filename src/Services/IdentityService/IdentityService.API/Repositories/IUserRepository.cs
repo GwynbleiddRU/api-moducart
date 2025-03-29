@@ -1,8 +1,14 @@
-public interface IUserRepository
+using System.Threading.Tasks;
+using IdentityService.API.Models;
+
+namespace IdentityService.API.Repositories
 {
-    Task<ApplicationUser> GetByEmailAsync(string email);
-    Task<ApplicationUser> CreateUserAsync(ApplicationUser user, string password);
-    Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
-    Task<ApplicationUser> GetByIdAsync(string id);
-    Task UpdateUserAsync(ApplicationUser user);
+    public interface IUserRepository
+    {
+        Task<ApplicationUser> CreateUserAsync(ApplicationUser user, string password);
+        Task<ApplicationUser> GetByEmailAsync(string email);
+        Task<ApplicationUser> GetByIdAsync(string id);
+        Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
+        Task UpdateUserAsync(ApplicationUser user);
+    }
 }

@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-public class LoginDto
+namespace IdentityService.API.DTOs
 {
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; }
+    public class LoginDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
 
-    [Required]
-    public string Password { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
 }

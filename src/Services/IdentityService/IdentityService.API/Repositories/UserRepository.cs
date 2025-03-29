@@ -1,64 +1,72 @@
 using MongoDB.Driver;
+using IdentityService.API.Models;
+using IdentityService.API.Extensions;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-public class UserRepository : IUserRepository
+namespace IdentityService.API.Repositories
 {
-    private readonly IMongoCollection<ApplicationUser> _users;
-    private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
-
-    public UserRepository(
-        IMongoDatabase database, 
-        IPasswordHasher<ApplicationUser> passwordHasher)
+    public class UserRepository : IUserRepository
     {
-        _users = database.GetCollection<ApplicationUser>("Users");
-        _passwordHasher = passwordHasher;
-    }
+        private readonly IMongoCollection<ApplicationUser> _users;
+        private readonly IdentityService.API.Extensions.IPasswordHasher<ApplicationUser> _passwordHasher;
 
-    public async Task<ApplicationUser> CreateUserAsync(ApplicationUser user, string password)
-    {
-        // Check if user already exists
-        var existingUser = await GetByEmailAsync(user.Email);
-        if (existingUser != null)
-            throw new InvalidOperationException("User with this email already exists");
+        public UserRepository(
+            IMongoDatabase database,
+            IdentityService.API.Extensions.IPasswordHasher<ApplicationUser> passwordHasher)
+        {
+            _users = database.GetCollection<ApplicationUser>("Users");
+            _passwordHasher = passwordHasher;
+        }
 
-        // Hash password
-        user.PasswordHash = _passwordHasher.HashPassword(user, password);
-        user.CreatedAt = DateTime.UtcNow;
-        
-        // Assign default role
-        user.Roles = new List<string> { "User" };
+        public async Task<ApplicationUser> CreateUserAsync(ApplicationUser user, string password)
+        {
+            // Check if user already exists
+            var existingUser = await GetByEmailAsync(user.Email);
+            if (existingUser != null)
+                throw new InvalidOperationException("User with this email already exists");
 
-        await _users.InsertOneAsync(user);
-        return user;
-    }
+            // Hash password
+            user.PasswordHash = _passwordHasher.HashPassword(user, password);
+            user.CreatedAt = DateTime.UtcNow;
 
-    public async Task<ApplicationUser> GetByEmailAsync(string email)
-    {
-        return await _users
-            .Find(u => u.Email == email)
-            .FirstOrDefaultAsync();
-    }
+            // Assign default role
+            user.Roles = new List<string> { "User" };
 
-    public async Task<ApplicationUser> GetByIdAsync(string id)
-    {
-        return await _users
-            .Find(u => u.Id == id)
-            .FirstOrDefaultAsync();
-    }
+            await _users.InsertOneAsync(user);
+            return user;
+        }
 
-    public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
-    {
-        var result = _passwordHasher.VerifyHashedPassword(
-            user, 
-            user.PasswordHash, 
-            password
-        );
+        public async Task<ApplicationUser> GetByEmailAsync(string email)
+        {
+            return await _users
+                .Find(u => u.Email == email)
+                .FirstOrDefaultAsync();
+        }
 
-        return result == PasswordVerificationResult.Success;
-    }
+        public async Task<ApplicationUser> GetByIdAsync(string id)
+        {
+            return await _users
+                .Find(u => u.Id == id)
+                .FirstOrDefaultAsync();
+        }
 
-    public async Task UpdateUserAsync(ApplicationUser user)
-    {
-        var filter = Builders<ApplicationUser>.Filter.Eq(u => u.Id, user.Id);
-        await _users.ReplaceOneAsync(filter, user);
+        public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
+        {
+            var result = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                password
+            );
+            return result == PasswordVerificationResult.Success;
+        }
+
+        public async Task UpdateUserAsync(ApplicationUser user)
+        {
+            var filter = Builders<ApplicationUser>.Filter.Eq(u => u.Id, user.Id);
+            await _users.ReplaceOneAsync(filter, user);
+        }
     }
 }

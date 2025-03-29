@@ -1,5 +1,10 @@
 using ProductService.API.Models;
+using ProductService.API.Data;
 using MongoDB.Driver;
+using MongoDB.Bson;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace ProductService.API.Repositories
 {
@@ -9,70 +14,55 @@ namespace ProductService.API.Repositories
 
         public ProductRepository(ApplicationDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .ToListAsync();
+            return await _context.Products.Find(_ => true).ToListAsync();
         }
 
         public async Task<Product> GetProductByIdAsync(string id)
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Products.Find(p => p.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category)
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .Where(p => p.Category.Name.ToLower() == category.ToLower())
-                .ToListAsync();
+            return await _context.Products.Find(p => p.Category.Name.ToLower() == category.ToLower()).ToListAsync();
         }
 
         public async Task<IEnumerable<Product>> GetFeaturedProductsAsync()
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .Where(p => p.IsFeatured)
-                .Take(4)
-                .ToListAsync();
+            return await _context.Products.Find(p => p.IsFeatured).Limit(4).ToListAsync();
         }
 
         public async Task<IEnumerable<Product>> GetNewArrivalsAsync()
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .OrderByDescending(p => p.CreatedAt)
-                .Take(3)
-                .ToListAsync();
+            return await _context.Products.Find(_ => true).SortByDescending(p => p.CreatedAt).Limit(3).ToListAsync();
         }
 
         public async Task<Product> AddProductAsync(Product product)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            await _context.Products.InsertOneAsync(product);
             return product;
         }
 
         public async Task UpdateProductAsync(Product product)
         {
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
+            var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
+            await _context.Products.ReplaceOneAsync(filter, product);
         }
 
-        public async Task DeleteProductAsync(Guid id)
+        public async Task DeleteProductAsync(string id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
-            }
+            var filter = Builders<Product>.Filter.Eq(p => p.Id, id);
+            await _context.Products.DeleteOneAsync(filter);
+        }
+        
+        public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        {
+            return await _context.Categories.Find(_ => true).ToListAsync();
         }
     }
 }

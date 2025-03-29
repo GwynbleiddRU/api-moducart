@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using ProductService.API.Data.Mocks;
 using ProductService.API.Models;
 using ProductService.API.Settings;

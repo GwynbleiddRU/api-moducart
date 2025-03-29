@@ -1,5 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
 public static class MongoDbExtensions
 {
+    public class MongoDbSettings
+    {
+        [Required]
+        public string ConnectionString { get; set; } = string.Empty;
+
+        [Required]
+        public string DatabaseName { get; set; } = string.Empty;
+    }
+
     public static IServiceCollection AddMongoDb(
         this IServiceCollection services, 
         IConfiguration configuration)

@@ -8,76 +8,83 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using IdentityService.API.DTOs;
+using IdentityService.API.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+namespace IdentityService.API.Controllers 
 {
-    private readonly IAuthService _authService;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(
-        IAuthService authService, 
-        ILogger<AuthController> logger)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
     {
-        _authService = authService;
-        _logger = logger;
-    }
+        private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
 
-    [HttpPost("register")]
-    [AllowAnonymous]
-    public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto registerDto)
-    {
-        try
+        public AuthController(
+            IAuthService authService, 
+            ILogger<AuthController> logger)
         {
-            var user = await _authService.RegisterAsync(registerDto);
-            return CreatedAtAction(nameof(GetProfile), new { userId = user.Id }, user);
+            _authService = authService;
+            _logger = logger;
         }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Registration error");
-            return StatusCode(500, "An error occurred during registration");
-        }
-    }
 
-    [HttpPost("login")]
-    [AllowAnonymous]
-    public async Task<ActionResult<string>> Login([FromBody] LoginDto loginDto)
-    {
-        try
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto registerDto)
         {
-            var token = await _authService.LoginAsync(loginDto);
-            return Ok(new { Token = token });
+            try
+            {
+                var user = await _authService.RegisterAsync(registerDto);
+                return CreatedAtAction(nameof(GetProfile), new { userId = user.Id }, user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Registration error");
+                return StatusCode(500, "An error occurred during registration");
+            }
         }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Login error");
-            return StatusCode(500, "An error occurred during login");
-        }
-    }
 
-    [HttpGet("profile")]
-    [Authorize]
-    public async Task<ActionResult<UserDto>> GetProfile()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        try
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> Login([FromBody] LoginDto loginDto)
         {
-            var profile = await _authService.GetUserProfileAsync(userId);
-            return Ok(profile);
+            try
+            {
+                var token = await _authService.LoginAsync(loginDto);
+                return Ok(new { Token = token });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Login error");
+                return StatusCode(500, "An error occurred during login");
+            }
         }
-        catch (KeyNotFoundException ex)
+
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<ActionResult<UserDto>> GetProfile()
         {
-            return NotFound(ex.Message);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            try
+            {
+                var profile = await _authService.GetUserProfileAsync(userId);
+                return Ok(profile);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

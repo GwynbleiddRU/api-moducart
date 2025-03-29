@@ -1,6 +1,11 @@
-public interface IAuthService
+using IdentityService.API.DTOs;
+
+namespace IdentityService.API.Services
 {
-    Task<UserDto> RegisterAsync(RegisterDto registerDto);
-    Task<string> LoginAsync(LoginDto loginDto);
-    Task<UserDto> GetUserProfileAsync(string userId);
+    public interface IAuthService
+    {
+        Task<UserDto> RegisterAsync(RegisterDto registerDto);
+        Task<string> LoginAsync(LoginDto loginDto);
+        Task<UserDto> GetUserProfileAsync(string userId);
+    }
 }
