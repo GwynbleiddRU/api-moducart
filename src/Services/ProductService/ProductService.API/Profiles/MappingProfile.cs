@@ -10,11 +10,13 @@ namespace ProductService.API.Profiles
         {
             // Product mappings
             CreateMap<Product, ProductDto>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => 
-                    src.Category != null ? src.Category.Name : string.Empty));
+                .ForMember(
+                    dest => dest.CategoryName,
+                    opt =>
+                        opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty)
+                );
 
-            CreateMap<ProductDto, Product>()
-                .ForMember(dest => dest.Category, opt => opt.Ignore());
+            CreateMap<ProductDto, Product>().ForMember(dest => dest.Category, opt => opt.Ignore());
 
             // Category mappings
             CreateMap<Category, CategoryDto>();

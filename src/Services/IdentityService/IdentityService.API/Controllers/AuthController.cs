@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentityService.API.DTOs;
+using IdentityService.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Swashbuckle.AspNetCore.Annotations;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using IdentityService.API.DTOs;
-using IdentityService.API.Services;
 
-namespace IdentityService.API.Controllers 
+namespace IdentityService.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -22,9 +22,7 @@ namespace IdentityService.API.Controllers
         private readonly IAuthService _authService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(
-            IAuthService authService, 
-            ILogger<AuthController> logger)
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
             _logger = logger;
@@ -75,7 +73,7 @@ namespace IdentityService.API.Controllers
         public async Task<ActionResult<UserDto>> GetProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
+
             try
             {
                 var profile = await _authService.GetUserProfileAsync(userId);

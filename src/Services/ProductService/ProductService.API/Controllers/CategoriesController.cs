@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProductService.API.DTOs;
 using ProductService.API.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ProductService.API.Controllers
 {
@@ -21,7 +21,8 @@ namespace ProductService.API.Controllers
         public CategoriesController(
             IProductRepository productRepository,
             IMapper mapper,
-            ILogger<CategoriesController> logger)
+            ILogger<CategoriesController> logger
+        )
         {
             _productRepository = productRepository;
             _mapper = mapper;

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -5,9 +8,6 @@ using Microsoft.Extensions.Logging;
 using ProductService.API.DTOs;
 using ProductService.API.Models;
 using ProductService.API.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ProductService.API.Controllers
 {
@@ -20,9 +20,10 @@ namespace ProductService.API.Controllers
         private readonly ILogger<ProductsController> _logger;
 
         public ProductsController(
-            IProductRepository productRepository, 
-            IMapper mapper, 
-            ILogger<ProductsController> logger)
+            IProductRepository productRepository,
+            IMapper mapper,
+            ILogger<ProductsController> logger
+        )
         {
             _productRepository = productRepository;
             _mapper = mapper;
@@ -52,7 +53,7 @@ namespace ProductService.API.Controllers
             try
             {
                 var product = await _productRepository.GetProductByIdAsync(id);
-                
+
                 if (product == null)
                     return NotFound();
 
@@ -67,7 +68,9 @@ namespace ProductService.API.Controllers
 
         [HttpGet("category/{category}")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(string category)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(
+            string category
+        )
         {
             try
             {
@@ -124,9 +127,10 @@ namespace ProductService.API.Controllers
 
                 var createdProduct = await _productRepository.AddProductAsync(product);
                 return CreatedAtAction(
-                    nameof(GetProduct), 
-                    new { id = createdProduct.Id }, 
-                    _mapper.Map<ProductDto>(createdProduct));
+                    nameof(GetProduct),
+                    new { id = createdProduct.Id },
+                    _mapper.Map<ProductDto>(createdProduct)
+                );
             }
             catch (InvalidOperationException ex)
             {
@@ -177,7 +181,7 @@ namespace ProductService.API.Controllers
             try
             {
                 var product = await _productRepository.GetProductByIdAsync(id);
-                
+
                 if (product == null)
                     return NotFound();
 

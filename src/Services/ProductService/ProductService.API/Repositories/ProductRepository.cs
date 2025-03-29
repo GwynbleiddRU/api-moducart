@@ -1,10 +1,10 @@
-using ProductService.API.Models;
-using ProductService.API.Data;
-using MongoDB.Driver;
-using MongoDB.Bson;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using ProductService.API.Data;
+using ProductService.API.Models;
 
 namespace ProductService.API.Repositories
 {
@@ -29,7 +29,9 @@ namespace ProductService.API.Repositories
 
         public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category)
         {
-            return await _context.Products.Find(p => p.Category.Name.ToLower() == category.ToLower()).ToListAsync();
+            return await _context
+                .Products.Find(p => p.Category.Name.ToLower() == category.ToLower())
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Product>> GetFeaturedProductsAsync()
@@ -39,7 +41,11 @@ namespace ProductService.API.Repositories
 
         public async Task<IEnumerable<Product>> GetNewArrivalsAsync()
         {
-            return await _context.Products.Find(_ => true).SortByDescending(p => p.CreatedAt).Limit(3).ToListAsync();
+            return await _context
+                .Products.Find(_ => true)
+                .SortByDescending(p => p.CreatedAt)
+                .Limit(3)
+                .ToListAsync();
         }
 
         public async Task<Product> AddProductAsync(Product product)
@@ -59,7 +65,7 @@ namespace ProductService.API.Repositories
             var filter = Builders<Product>.Filter.Eq(p => p.Id, id);
             await _context.Products.DeleteOneAsync(filter);
         }
-        
+
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
             return await _context.Categories.Find(_ => true).ToListAsync();

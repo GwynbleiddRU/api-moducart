@@ -1,11 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using AutoMapper;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
 using IdentityService.API.DTOs;
 using IdentityService.API.Models;
 using IdentityService.API.Repositories;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityService.API.Services
 {
@@ -20,9 +20,11 @@ namespace IdentityService.API.Services
             IUserRepository userRepository,
             IMapper mapper,
             IConfiguration configuration,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger
+        )
         {
-            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _userRepository =
+                userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _configuration = configuration;
             _logger = logger;
@@ -35,7 +37,7 @@ namespace IdentityService.API.Services
                 Email = registerDto.Email,
                 UserName = registerDto.Email,
                 FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName
+                LastName = registerDto.LastName,
             };
 
             try
@@ -83,27 +85,27 @@ namespace IdentityService.API.Services
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
-                }),
+                Subject = new ClaimsIdentity(
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                    }
+                ),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key), 
+                    new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature
                 ),
                 Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"]
+                Audience = _configuration["Jwt:Audience"],
             };
 
             // Add role claims
             foreach (var role in user.Roles)
             {
-                tokenDescriptor.Subject.AddClaim(
-                    new Claim(ClaimTypes.Role, role)
-                );
+                tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role));
             }
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

@@ -1,3 +1,1 @@
-namespace IdentityService.API.Profiles
-{
-}
+namespace IdentityService.API.Profiles { }

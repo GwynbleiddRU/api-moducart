@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace IdentityService.API 
+namespace IdentityService.API
 {
     public class Program
     {
@@ -23,7 +23,7 @@ namespace IdentityService.API
             // try
             // {
             //     Log.Information("Starting up the host");
-                CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
             // }
             // catch (Exception ex)
             // {

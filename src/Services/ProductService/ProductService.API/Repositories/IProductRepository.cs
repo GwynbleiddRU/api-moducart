@@ -1,6 +1,6 @@
-using ProductService.API.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ProductService.API.Models;
 
 namespace ProductService.API.Repositories
 {

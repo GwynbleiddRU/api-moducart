@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Options; 
-using MongoDB.Driver;
-using MongoDB.Bson.Serialization.Attributes;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
-namespace IdentityService.API.Extensions 
+namespace IdentityService.API.Extensions
 {
     public class MongoDbSettings
     {
@@ -20,12 +20,12 @@ namespace IdentityService.API.Extensions
     public static class MongoDbExtensions
     {
         public static IServiceCollection AddMongoDb(
-            this IServiceCollection services, 
-            IConfiguration configuration)
+            this IServiceCollection services,
+            IConfiguration configuration
+        )
         {
             // Configure MongoDB settings
-            services.Configure<MongoDbSettings>(
-                configuration.GetSection(nameof(MongoDbSettings)));
+            services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
 
             // Register MongoDB client
             services.AddSingleton<IMongoClient>(sp =>

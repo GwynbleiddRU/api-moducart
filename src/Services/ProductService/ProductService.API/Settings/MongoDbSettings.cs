@@ -1,4 +1,4 @@
-namespace ProductService.API.Settings 
+namespace ProductService.API.Settings
 {
     public class MongoDbSettings
     {

@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityService.API.Extensions
 {
-    public class PasswordHasher<TUser> : IPasswordHasher<TUser> where TUser : class
+    public class PasswordHasher<TUser> : IPasswordHasher<TUser>
+        where TUser : class
     {
         private const int SaltSize = 16; // 128-bit
-        private const int KeySize = 32;  // 256-bit
+        private const int KeySize = 32; // 256-bit
         private const int Iterations = 10000;
         private const char Delimiter = ':';
         private readonly HashAlgorithmName _hashAlgorithm = HashAlgorithmName.SHA256;
@@ -21,17 +22,23 @@ namespace IdentityService.API.Extensions
                 salt,
                 Iterations,
                 _hashAlgorithm,
-                KeySize);
+                KeySize
+            );
 
             return string.Join(
                 Delimiter,
                 Convert.ToBase64String(salt),
                 Convert.ToBase64String(hash),
                 Iterations,
-                _hashAlgorithm.Name);
+                _hashAlgorithm.Name
+            );
         }
 
-        public PasswordVerificationResult VerifyHashedPassword(TUser user, string hashedPassword, string providedPassword)
+        public PasswordVerificationResult VerifyHashedPassword(
+            TUser user,
+            string hashedPassword,
+            string providedPassword
+        )
         {
             var elements = hashedPassword.Split(Delimiter);
             if (elements.Length != 4)
@@ -48,7 +55,8 @@ namespace IdentityService.API.Extensions
                 salt,
                 iterations,
                 algorithm,
-                hash.Length);
+                hash.Length
+            );
 
             return CryptographicOperations.FixedTimeEquals(hash, verificationHash)
                 ? PasswordVerificationResult.Success

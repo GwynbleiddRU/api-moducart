@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using MongoDB.Driver;
 using ProductService.API.Models;
-using System.Collections.Generic;
 
 namespace ProductService.API.Data
 {
@@ -14,6 +14,7 @@ namespace ProductService.API.Data
         }
 
         public IMongoCollection<Product> Products => _database.GetCollection<Product>("Products");
-        public IMongoCollection<Category> Categories => _database.GetCollection<Category>("Categories");
+        public IMongoCollection<Category> Categories =>
+            _database.GetCollection<Category>("Categories");
     }
 }

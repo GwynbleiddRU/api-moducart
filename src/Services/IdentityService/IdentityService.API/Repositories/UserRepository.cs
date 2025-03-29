@@ -1,10 +1,10 @@
-using MongoDB.Driver;
-using IdentityService.API.Models;
-using IdentityService.API.Extensions;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using IdentityService.API.Extensions;
+using IdentityService.API.Models;
+using Microsoft.AspNetCore.Identity;
+using MongoDB.Driver;
 
 namespace IdentityService.API.Repositories
 {
@@ -15,7 +15,8 @@ namespace IdentityService.API.Repositories
 
         public UserRepository(
             IMongoDatabase database,
-            IdentityService.API.Extensions.IPasswordHasher<ApplicationUser> passwordHasher)
+            IdentityService.API.Extensions.IPasswordHasher<ApplicationUser> passwordHasher
+        )
         {
             _users = database.GetCollection<ApplicationUser>("Users");
             _passwordHasher = passwordHasher;
@@ -41,25 +42,17 @@ namespace IdentityService.API.Repositories
 
         public async Task<ApplicationUser> GetByEmailAsync(string email)
         {
-            return await _users
-                .Find(u => u.Email == email)
-                .FirstOrDefaultAsync();
+            return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
         }
 
         public async Task<ApplicationUser> GetByIdAsync(string id)
         {
-            return await _users
-                .Find(u => u.Id == id)
-                .FirstOrDefaultAsync();
+            return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
         {
-            var result = _passwordHasher.VerifyHashedPassword(
-                user,
-                user.PasswordHash,
-                password
-            );
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
             return result == PasswordVerificationResult.Success;
         }
 

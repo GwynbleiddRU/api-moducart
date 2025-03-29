@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace IdentityService.API.DTOs 
+namespace IdentityService.API.DTOs
 {
     public class RegisterDto
     {

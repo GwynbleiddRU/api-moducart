@@ -1,6 +1,6 @@
-using ProductService.API.Models;
 using System;
 using System.Collections.Generic;
+using ProductService.API.Models;
 
 namespace ProductService.API.Data.Mocks
 {
@@ -10,10 +10,30 @@ namespace ProductService.API.Data.Mocks
         {
             return new List<Category>
             {
-                new Category { Id = "6507e9a33c4c9b9d6e4c83b1", Name = "Electronics", Description = "Electronic devices and gadgets" },
-                new Category { Id = "6507e9a33c4c9b9d6e4c83b2", Name = "Clothing", Description = "Men's and women's apparel" },
-                new Category { Id = "6507e9a33c4c9b9d6e4c83b3", Name = "Home", Description = "Home decor and furniture" },
-                new Category { Id = "6507e9a33c4c9b9d6e4c83b4", Name = "Books", Description = "Books and literature" }
+                new Category
+                {
+                    Id = "6507e9a33c4c9b9d6e4c83b1",
+                    Name = "Electronics",
+                    Description = "Electronic devices and gadgets",
+                },
+                new Category
+                {
+                    Id = "6507e9a33c4c9b9d6e4c83b2",
+                    Name = "Clothing",
+                    Description = "Men's and women's apparel",
+                },
+                new Category
+                {
+                    Id = "6507e9a33c4c9b9d6e4c83b3",
+                    Name = "Home",
+                    Description = "Home decor and furniture",
+                },
+                new Category
+                {
+                    Id = "6507e9a33c4c9b9d6e4c83b4",
+                    Name = "Books",
+                    Description = "Books and literature",
+                },
             };
         }
 
@@ -38,7 +58,7 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[0],
                     IsFeatured = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-30),
-                    StockQuantity = 50
+                    StockQuantity = 50,
                 },
                 new Product
                 {
@@ -51,7 +71,7 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[0],
                     IsFeatured = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-60),
-                    StockQuantity = 25
+                    StockQuantity = 25,
                 },
                 new Product
                 {
@@ -64,7 +84,7 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[1],
                     IsFeatured = false,
                     CreatedAt = DateTime.UtcNow.AddDays(-15),
-                    StockQuantity = 100
+                    StockQuantity = 100,
                 },
                 new Product
                 {
@@ -77,7 +97,7 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[0],
                     IsFeatured = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    StockQuantity = 75
+                    StockQuantity = 75,
                 },
                 new Product
                 {
@@ -90,7 +110,7 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[0],
                     IsFeatured = true,
                     CreatedAt = DateTime.UtcNow.AddDays(-2),
-                    StockQuantity = 40
+                    StockQuantity = 40,
                 },
                 new Product
                 {
@@ -103,7 +123,7 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[2],
                     IsFeatured = false,
                     CreatedAt = DateTime.UtcNow.AddDays(-45),
-                    StockQuantity = 15
+                    StockQuantity = 15,
                 },
                 new Product
                 {
@@ -116,8 +136,8 @@ namespace ProductService.API.Data.Mocks
                     Category = categories[3],
                     IsFeatured = false,
                     CreatedAt = DateTime.UtcNow.AddDays(-20),
-                    StockQuantity = 200
-                }
+                    StockQuantity = 200,
+                },
             };
         }
     }

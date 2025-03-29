@@ -1,14 +1,14 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using MongoDB.Bson;
-using ProductService.API.Data.Mocks;
-using ProductService.API.Models;
-using ProductService.API.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using ProductService.API.Data.Mocks;
+using ProductService.API.Models;
+using ProductService.API.Settings;
 
 namespace ProductService.API.Repositories
 {
@@ -22,7 +22,8 @@ namespace ProductService.API.Repositories
         public MongoProductRepository(
             IMongoClient mongoClient,
             IOptions<MongoDbSettings> settings,
-            ILogger<MongoProductRepository> logger)
+            ILogger<MongoProductRepository> logger
+        )
         {
             _logger = logger;
 
@@ -31,7 +32,7 @@ namespace ProductService.API.Repositories
                 var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
                 _products = database.GetCollection<Product>("Products");
                 _categories = database.GetCollection<Category>("Categories");
-                
+
                 // Test connection
                 database.RunCommandAsync((Command<BsonDocument>)"{ping:1}").Wait();
                 _logger.LogInformation("Successfully connected to MongoDB");
@@ -93,7 +94,8 @@ namespace ProductService.API.Repositories
             if (!_isConnected)
             {
                 _logger.LogWarning("Using mock data for GetProductsByCategoryAsync");
-                return MockProductData.GetMockProducts()
+                return MockProductData
+                    .GetMockProducts()
                     .Where(p => p.Category?.Name.ToLower() == category.ToLower());
             }
 
@@ -115,8 +117,12 @@ namespace ProductService.API.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error retrieving products for category {category} from MongoDB");
-                return MockProductData.GetMockProducts()
+                _logger.LogError(
+                    ex,
+                    $"Error retrieving products for category {category} from MongoDB"
+                );
+                return MockProductData
+                    .GetMockProducts()
                     .Where(p => p.Category?.Name.ToLower() == category.ToLower());
             }
         }
@@ -126,17 +132,12 @@ namespace ProductService.API.Repositories
             if (!_isConnected)
             {
                 _logger.LogWarning("Using mock data for GetFeaturedProductsAsync");
-                return MockProductData.GetMockProducts()
-                    .Where(p => p.IsFeatured)
-                    .Take(4);
+                return MockProductData.GetMockProducts().Where(p => p.IsFeatured).Take(4);
             }
 
             try
             {
-                var products = await _products
-                    .Find(p => p.IsFeatured)
-                    .Limit(4)
-                    .ToListAsync();
+                var products = await _products.Find(p => p.IsFeatured).Limit(4).ToListAsync();
 
                 await PopulateCategoryInfoAsync(products);
                 return products;
@@ -144,9 +145,7 @@ namespace ProductService.API.Repositories
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving featured products from MongoDB");
-                return MockProductData.GetMockProducts()
-                    .Where(p => p.IsFeatured)
-                    .Take(4);
+                return MockProductData.GetMockProducts().Where(p => p.IsFeatured).Take(4);
             }
         }
 
@@ -155,7 +154,8 @@ namespace ProductService.API.Repositories
             if (!_isConnected)
             {
                 _logger.LogWarning("Using mock data for GetNewArrivalsAsync");
-                return MockProductData.GetMockProducts()
+                return MockProductData
+                    .GetMockProducts()
                     .OrderByDescending(p => p.CreatedAt)
                     .Take(3);
             }
@@ -174,7 +174,8 @@ namespace ProductService.API.Repositories
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving new arrivals from MongoDB");
-                return MockProductData.GetMockProducts()
+                return MockProductData
+                    .GetMockProducts()
                     .OrderByDescending(p => p.CreatedAt)
                     .Take(3);
             }
@@ -224,7 +225,9 @@ namespace ProductService.API.Repositories
             if (!_isConnected)
             {
                 _logger.LogWarning("MongoDB not connected. Cannot update product.");
-                throw new InvalidOperationException("Cannot update product: Database not connected");
+                throw new InvalidOperationException(
+                    "Cannot update product: Database not connected"
+                );
             }
 
             try
@@ -244,7 +247,9 @@ namespace ProductService.API.Repositories
             if (!_isConnected)
             {
                 _logger.LogWarning("MongoDB not connected. Cannot delete product.");
-                throw new InvalidOperationException("Cannot delete product: Database not connected");
+                throw new InvalidOperationException(
+                    "Cannot delete product: Database not connected"
+                );
             }
 
             try
