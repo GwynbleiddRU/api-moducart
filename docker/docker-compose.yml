@@ -1,31 +1,35 @@
-version: '3.4'
-
 services:
   api-gateway:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.ApiGateway
     ports:
       - "5000:80"
     depends_on:
       - identity-service
       - product-service
+    networks:
+      - moducart-network
 
   identity-service:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.IdentityService
     ports:
       - "5001:80"
     depends_on:
       - mongo
+    networks:
+      - moducart-network
 
   product-service:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.ProductService
     ports:
       - "5002:80"
+    networks:
+      - moducart-network
 
   mongo:
     image: mongo
@@ -35,3 +39,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root_password
     ports:
       - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - moducart-network
+
+networks:
+  moducart-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
