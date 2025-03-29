@@ -1,0 +1,7 @@
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.csproj.AssemblyReference.cache
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.GeneratedMSBuildEditorConfig.editorconfig
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.AssemblyInfoInputs.cache
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.AssemblyInfo.cs
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.csproj.CoreCompileInputs.cache
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.MvcApplicationPartsAssemblyInfo.cs
+/Users/Gwynbleidd/Repository/Personal/ModuCart/src/Services/IdentityService/IdentityService.API/obj/Debug/net9.0/IdentityService.API.MvcApplicationPartsAssemblyInfo.cache
