@@ -1,6 +1,96 @@
-@Ocelot_HostAddress = http://localhost:5218
+### API Gateway Test Requests
 
-GET {{Ocelot_HostAddress}}/weatherforecast/
+### Product Service Tests
+# Get all products
+GET https://api.yourecommerce.com/products
 Accept: application/json
 
-###
+### Get product by ID
+GET https://api.yourecommerce.com/products/1
+Accept: application/json
+
+### Create new product
+POST https://api.yourecommerce.com/products
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "description": "This is a test product",
+  "price": 19.99,
+  "categoryId": 1,
+  "stockQuantity": 100
+}
+
+### Order Service Tests
+# Get all orders
+GET https://api.yourecommerce.com/orders
+Accept: application/json
+
+### Get order by ID
+GET https://api.yourecommerce.com/orders/1
+Accept: application/json
+
+### Create new order
+POST https://api.yourecommerce.com/orders
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2
+    },
+    {
+      "productId": 3,
+      "quantity": 1
+    }
+  ],
+  "shippingAddress": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zipCode": "12345",
+    "country": "USA"
+  }
+}
+
+### Customer Service Tests
+# Get all customers
+GET https://api.yourecommerce.com/customers
+Accept: application/json
+
+### Get customer by ID
+GET https://api.yourecommerce.com/customers/1
+Accept: application/json
+
+### Cart Service Tests
+# Get cart by customer ID
+GET https://api.yourecommerce.com/carts/customer/1
+Accept: application/json
+
+### Add item to cart
+POST https://api.yourecommerce.com/carts/1/items
+Content-Type: application/json
+
+{
+  "productId": 2,
+  "quantity": 1
+}
+
+### Payment Service Tests
+# Process payment
+POST https://api.yourecommerce.com/payments/process
+Content-Type: application/json
+
+{
+  "orderId": 1,
+  "paymentMethod": "creditCard",
+  "amount": 59.97,
+  "cardDetails": {
+    "number": "4111111111111111",
+    "expiryMonth": 12,
+    "expiryYear": 2025,
+    "cvv": "123"
+  }
+}
