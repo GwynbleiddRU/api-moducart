@@ -1,31 +1,22 @@
-# Base image for runtime
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-WORKDIR /app
-EXPOSE 80
-
-# Build stage - Use the .NET SDK
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy only the project file first
-COPY ["src/Services/IdentityService/IdentityService.API/IdentityService.API.csproj", "IdentityService.API/"]
-WORKDIR "/src/IdentityService.API"
-RUN dotnet restore "IdentityService.API.csproj"
+# Copy csproj and restore
+COPY ["src/Services/IdentityService/IdentityService.API/IdentityService.API.csproj", "src/Services/IdentityService/IdentityService.API/"]
+RUN dotnet restore "src/Services/IdentityService/IdentityService.API/IdentityService.API.csproj"
 
-# Copy the rest of the source code
+# Copy everything else and build
 COPY . .
+WORKDIR "/src/src/Services/IdentityService/IdentityService.API"
 RUN dotnet build "IdentityService.API.csproj" -c Release -o /app/build
 
-# Publish the application
+# Publish
 FROM build AS publish
 RUN dotnet publish "IdentityService.API.csproj" -c Release -o /app/publish
 
-# Final runtime image
-FROM base AS final
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-# Verify that the app files exist
-CMD ["ls", "-l", "/app"]
-
 ENTRYPOINT ["dotnet", "IdentityService.API.dll"]
