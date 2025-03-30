@@ -5,11 +5,14 @@ services:
       dockerfile: docker/Dockerfile.ApiGateway
     ports:
       - "5000:80"
-    depends_on:
-      - identity-service
-      - product-service
+    # depends_on:
+    #   identity-service:
+    #     condition: service_healthy
+    #   product-service:
+    #     condition: service_healthy
     networks:
       - moducart-network
+    restart: unless-stopped
 
   identity-service:
     build:
@@ -17,19 +20,45 @@ services:
       dockerfile: docker/Dockerfile.IdentityService
     ports:
       - "5001:80"
+    healthcheck:
+      test: ["CMD", "dotnet", "IdentityService.API.dll", "check-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     networks:
       - moducart-network
-
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbSettings__ConnectionString=mongodb://root:root_password@mongo-db:27017
+    restart: unless-stopped
+  
   product-service:
     build:
       context: ..
       dockerfile: docker/Dockerfile.ProductService
     ports:
       - "5002:80"
+    healthcheck:
+      test: ["CMD", "dotnet", "ProductService.API.dll", "check-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      mongo:
+        condition: service_healthy
     networks:
       - moducart-network
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbSettings__ConnectionString=mongodb://root:root_password@mongo-db:27017
+    restart: unless-stopped
 
   mongo:
     image: mongo
@@ -43,6 +72,12 @@ services:
       - mongo-data:/data/db
     networks:
       - moducart-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
 
 networks:
   moducart-network:

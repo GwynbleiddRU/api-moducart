@@ -9,11 +9,14 @@ RUN dotnet restore "src/Services/ProductService/ProductService.API/ProductServic
 # Copy everything else and build
 COPY . .
 WORKDIR "/src/src/Services/ProductService/ProductService.API"
+# RUN apt-get update && apt-get install -y wget
+RUN mkdir -p /app/keys && chmod 777 /app/keys
 RUN dotnet build "ProductService.API.csproj" -c Release -o /app/build
 
 # Publish
 FROM build AS publish
 RUN dotnet publish "ProductService.API.csproj" -c Release -o /app/publish
+EXPOSE 80
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
