@@ -29,12 +29,11 @@ namespace IdentityService.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add Controllers
+            services.AddControllers();
+
             // MongoDB Configuration
             services.AddMongoDb(Configuration);
-            // services.AddSingleton<IMongoClient>(
-            //     s => new MongoClient(Configuration["MongoDbSettings:ConnectionString"])
-            // );
-
 
             // Identity and Authentication
             services.AddScoped<IPasswordHasher<ApplicationUser>, PasswordHasher<ApplicationUser>>();
@@ -111,6 +110,7 @@ namespace IdentityService.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGet("/health", () => "Healthy");
             });
         }
     }

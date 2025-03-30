@@ -43,6 +43,7 @@ namespace ModuCart.ApiGateway
                             logging.AddDebug();
                         }
                     );
+                    webBuilder.UseUrls("http://*:80"); // Force port 80 binding
                 });
     }
 }

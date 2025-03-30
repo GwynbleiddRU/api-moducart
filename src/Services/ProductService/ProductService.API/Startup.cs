@@ -29,6 +29,7 @@ namespace ProductService.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
             // MongoDB Configuration
             services.AddMongoDb(Configuration);
             // services.AddSingleton<IMongoClient>(
@@ -126,6 +127,7 @@ namespace ProductService.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGet("/health", () => "Healthy");
             });
         }
     }
