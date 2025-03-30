@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using MMLib.SwaggerForOcelot.Configuration;
-using MMLib.SwaggerForOcelot.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Consul;
 using Ocelot.Provider.Polly;
 
 namespace ModuCart.ApiGateway
@@ -27,7 +29,6 @@ namespace ModuCart.ApiGateway
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
             services.AddCors(options =>
             {
                 options.AddPolicy(
@@ -36,34 +37,18 @@ namespace ModuCart.ApiGateway
                 );
             });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc(
-                    "v1",
-                    new OpenApiInfo
-                    {
-                        Title = "E-Commerce API Gateway",
-                        Version = "v1",
-                        Description = "API Gateway for E-Commerce Microservices",
-                        Contact = new OpenApiContact
-                        {
-                            Name = "Your Name",
-                            Email = "your.email@example.com",
-                        },
-                    }
-                );
-            });
-
+            // Configure SwaggerForOcelot before Ocelot
             services.AddSwaggerForOcelot(Configuration);
 
             services
                 .AddOcelot(Configuration)
+                .AddConsul()
                 .AddCacheManager(x =>
                 {
                     x.WithDictionaryHandle();
                 })
-                .AddPolly()
-                .AddTransientDefinedAggregator<ServicesAggregator>();
+                .AddPolly();
+            // .AddTransientDefinedAggregator<ServicesAggregator>();
 
             // Add health checks
             services.AddHealthChecks();
@@ -77,22 +62,15 @@ namespace ModuCart.ApiGateway
             }
 
             app.UseHttpsRedirection();
-
             app.UseCors("CorsPolicy");
-
             app.UseRouting();
-
             app.UseAuthorization();
-
-            // Add Swagger UI
-            app.UseSwagger();
 
             // Configure Swagger for Ocelot
             app.UseSwaggerForOcelotUI(opt =>
             {
                 opt.PathToSwaggerGenerator = "/swagger/docs";
-                opt.ReConfigureUpstreamSwaggerJson = AlterUpstream;
-                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway API v1");
+                opt.ReConfigureUpstreamSwaggerJson = AlterUpstreamSwaggerJson;
             });
 
             app.UseEndpoints(endpoints =>
@@ -104,19 +82,21 @@ namespace ModuCart.ApiGateway
             app.UseOcelot().Wait();
         }
 
-        private string AlterUpstream(
-            HttpContext context,
-            SwaggerForOcelotUIOptions options,
-            string swaggerJson
-        )
+        private string AlterUpstreamSwaggerJson(HttpContext context, string swaggerJson)
         {
-            return swaggerJson.Replace("localhost", "yourecommerce.com");
+            var swagger = JObject.Parse(swaggerJson);
+            // Replace localhost with yourecommerce.com
+            return swagger.ToString(Formatting.Indented).Replace("localhost", "yourecommerce.com");
         }
     }
 
-    // Sample aggregator class to combine results from different services if needed
-    public class ServicesAggregator
-    {
-        // Implement aggregation logic here if needed
-    }
+    // // Sample aggregator class to combine results from different services if needed
+    // public class ServicesAggregator : Ocelot.Middleware.Multiplexer.IDefinedAggregator
+    // {
+    //     public async Task<DownstreamResponse> Aggregate(List<HttpContext> responses)
+    //     {
+    //         // Implement aggregation logic here if needed
+    //         return await Task.FromResult<DownstreamResponse>(null);
+    //     }
+    // }
 }
