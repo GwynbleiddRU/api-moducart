@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using ProductService.API.Extensions;
+using ProductService.API.Repositories;
+// using ProductService.API.Services;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -38,7 +41,14 @@ namespace ProductService.API
 
 
             // Product services
-            // services.AddScoped<IAuthService, AuthService>();
+            //services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            // services.AddScoped<ApplicationDbContext>(sp =>
+            // {
+            //     var client = sp.GetRequiredService<IMongoClient>();
+            //     var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+            //     return new ApplicationDbContext(client, settings.DatabaseName);
+            // });
 
             // JWT Authentication
             services
@@ -67,7 +77,7 @@ namespace ProductService.API
             });
 
             // Automapper
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(Startup).Assembly);
 
             // Swagger
             services.AddSwaggerGen(c =>
@@ -106,6 +116,10 @@ namespace ProductService.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsProduction())
+            {
+                app.UseHttpsRedirection();
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -117,7 +131,7 @@ namespace ProductService.API
                 });
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseRouting();
 
             // Authentication and Authorization middleware

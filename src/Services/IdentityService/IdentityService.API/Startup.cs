@@ -67,7 +67,8 @@ namespace IdentityService.API
             });
 
             // Automapper
-            services.AddAutoMapper(typeof(Startup));
+            // services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(Startup).Assembly);
 
             // Swagger
             services.AddSwaggerGen(c =>
@@ -89,6 +90,11 @@ namespace IdentityService.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsProduction())
+            {
+                app.UseHttpsRedirection();
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -100,7 +106,7 @@ namespace IdentityService.API
                 });
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseRouting();
 
             // Authentication and Authorization middleware
