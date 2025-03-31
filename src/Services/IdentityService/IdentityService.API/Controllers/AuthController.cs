@@ -16,7 +16,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace IdentityService.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;

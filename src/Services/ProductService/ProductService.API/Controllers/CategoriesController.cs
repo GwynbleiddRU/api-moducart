@@ -11,7 +11,7 @@ using ProductService.API.Repositories;
 namespace ProductService.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     public class CategoriesController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
