@@ -1,45 +1,50 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
 namespace IdentityService.API.Extensions
 {
-    public class MongoDbSettings
-    {
-        [Required]
-        public string ConnectionString { get; set; } = string.Empty;
-
-        [Required]
-        public string DatabaseName { get; set; } = string.Empty;
-    }
-
     public static class MongoDbExtensions
     {
+        public class MongoDbSettings
+        {
+            public string ConnectionString { get; set; }
+            public string DatabaseName { get; set; }
+        }
+
         public static IServiceCollection AddMongoDb(
             this IServiceCollection services,
             IConfiguration configuration
         )
         {
-            // Configure MongoDB settings
-            services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
+            // Get configuration section
+            var configSection = configuration.GetSection("MongoDbSettings");
 
-            // Register MongoDB client
-            services.AddSingleton<IMongoClient>(sp =>
+            // Manually bind and validate settings
+            var settings = new MongoDbSettings
             {
-                var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-                return new MongoClient(settings.ConnectionString);
-            });
+                ConnectionString = configSection["ConnectionString"],
+                DatabaseName = configSection["DatabaseName"],
+            };
 
-            // Register MongoDB database
-            services.AddScoped(sp =>
+            // Validate settings
+            if (string.IsNullOrWhiteSpace(settings.ConnectionString))
+                throw new ApplicationException("MongoDB ConnectionString is not configured");
+            if (string.IsNullOrWhiteSpace(settings.DatabaseName))
+                throw new ApplicationException("MongoDB DatabaseName is not configured");
+
+            // Register services
+            services.AddSingleton(settings); // Direct instance
+            services.AddSingleton<IMongoClient>(new MongoClient(settings.ConnectionString));
+
+            // Register database instance with validation
+            services.AddScoped<IMongoDatabase>(sp =>
             {
                 var client = sp.GetRequiredService<IMongoClient>();
-                var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-                return client.GetDatabase(settings.DatabaseName);
+                var config = sp.GetRequiredService<MongoDbSettings>();
+                return client.GetDatabase(config.DatabaseName);
             });
 
             return services;
