@@ -4,6 +4,7 @@ using System.Text;
 using AutoMapper;
 using IdentityService.API.DTOs;
 using IdentityService.API.Models;
+using IdentityService.API.Profiles;
 using IdentityService.API.Repositories;
 using Microsoft.IdentityModel.Tokens;
 
