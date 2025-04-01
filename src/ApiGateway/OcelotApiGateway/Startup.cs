@@ -1,11 +1,13 @@
-using System;
-using System.Collections.Generic;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,39 +21,76 @@ namespace ModuCart.ApiGateway
 {
     public class Startup
     {
+        private const string CorsPolicyName = "CorsPolicy";
+        private readonly IConfiguration _configuration;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // 🔹 CORS Policy - Restrict to allowed origins
             services.AddCors(options =>
             {
                 options.AddPolicy(
-                    "CorsPolicy",
-                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+                    CorsPolicyName,
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins(_configuration["Cors:AllowedOrigins"].Split(','))
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    }
                 );
             });
 
-            // Configure SwaggerForOcelot before Ocelot
-            services.AddSwaggerForOcelot(Configuration);
-
+            // 🔹 Authentication (JWT)
             services
-                .AddOcelot(Configuration)
-                .AddConsul()
-                .AddCacheManager(x =>
-                {
-                    x.WithDictionaryHandle();
-                })
-                .AddPolly();
-            // .AddTransientDefinedAggregator<ServicesAggregator>();
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(
+                    "Bearer",
+                    options =>
+                    {
+                        options.Authority = _configuration["IdentityServer:Url"];
+                        options.RequireHttpsMetadata = false;
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = _configuration["IdentityServer:Issuer"],
+                            ValidAudience = _configuration["IdentityServer:Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"])
+                            ),
+                        };
+                    }
+                );
 
-            // Add health checks
+            // 🔹 Swagger for Ocelot
+            services.AddSwaggerForOcelot(_configuration);
+
+            // 🔹 Ocelot with Consul, Polly, and Caching
+            services
+                .AddOcelot(_configuration)
+                .AddConsul()
+                .AddCacheManager(x => x.WithDictionaryHandle())
+                .AddPolly();
+
+            // 🔹 Health Checks
             services.AddHealthChecks();
+
+            // 🔹 API Behavior Configuration
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -60,43 +99,48 @@ namespace ModuCart.ApiGateway
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/error");
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
-            app.UseCors("CorsPolicy");
+
+            // 🔹 Enable CORS
+            app.UseCors(CorsPolicyName);
+
             app.UseRouting();
+
+            // 🔹 Authentication & Authorization
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            // Configure Swagger for Ocelot
+            // 🔹 Swagger UI for Ocelot
             app.UseSwaggerForOcelotUI(opt =>
             {
                 opt.PathToSwaggerGenerator = "/swagger/docs";
                 opt.ReConfigureUpstreamSwaggerJson = AlterUpstreamSwaggerJson;
             });
 
+            // 🔹 Health checks endpoint
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
 
+            // 🔹 Ocelot Middleware
             app.UseOcelot().Wait();
         }
 
+        // 🔹 Custom Swagger JSON Modifier
         private string AlterUpstreamSwaggerJson(HttpContext context, string swaggerJson)
         {
             var swagger = JObject.Parse(swaggerJson);
-            // Replace localhost with yourecommerce.com
-            return swagger.ToString(Formatting.Indented).Replace("localhost", "yourecommerce.com");
+            return swagger
+                .ToString(Formatting.Indented)
+                .Replace("localhost", _configuration["ApiGateway:ExternalUrl"]);
         }
     }
-
-    // // Sample aggregator class to combine results from different services if needed
-    // public class ServicesAggregator : Ocelot.Middleware.Multiplexer.IDefinedAggregator
-    // {
-    //     public async Task<DownstreamResponse> Aggregate(List<HttpContext> responses)
-    //     {
-    //         // Implement aggregation logic here if needed
-    //         return await Task.FromResult<DownstreamResponse>(null);
-    //     }
-    // }
 }
