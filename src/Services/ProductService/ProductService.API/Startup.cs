@@ -82,7 +82,7 @@ namespace ProductService.API
             // Swagger
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ModuCart API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "product-service", Version = "v1" });
 
                 // JWT Bearer token configuration for Swagger
                 c.AddSecurityDefinition(
@@ -127,7 +127,7 @@ namespace ProductService.API
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ModuCart API v1");
-                    c.RoutePrefix = string.Empty; // Optional: makes Swagger UI the root URL
+                    c.RoutePrefix = string.Empty; // makes Swagger UI the root URL
                 });
             }
 
