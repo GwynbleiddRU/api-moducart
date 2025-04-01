@@ -1,27 +1,41 @@
 services:
   api-gateway:
+    image: ${DOCKER_REGISTRY-}api-gateway
     build:
       context: ..
       dockerfile: docker/Dockerfile.ApiGateway
     ports:
       - "5000:80"
-    # depends_on:
-    #   identity-service:
-    #     condition: service_healthy
-    #   product-service:
-    #     condition: service_healthy
+    depends_on:
+      identity-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - IdentityService__Url=http://identity-service
+    - ProductService__Url=http://product-service
+    - OrderService__Url=http://order-service
     networks:
       - moducart-network
     restart: unless-stopped
 
   identity-service:
+    image: ${DOCKER_REGISTRY-}identity-service
     build:
       context: ..
       dockerfile: docker/Dockerfile.IdentityService
     ports:
       - "5001:80"
     healthcheck:
-      test: ["CMD", "dotnet", "IdentityService.API.dll", "check-health"]
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -38,13 +52,14 @@ services:
     restart: unless-stopped
   
   product-service:
+    image: ${DOCKER_REGISTRY-}product-service
     build:
       context: ..
       dockerfile: docker/Dockerfile.ProductService
     ports:
       - "5002:80"
     healthcheck:
-      test: ["CMD", "dotnet", "ProductService.API.dll", "check-health"]
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -61,13 +76,14 @@ services:
     restart: unless-stopped
 
   order-service:
+    image: ${DOCKER_REGISTRY-}order-service
     build:
       context: ..
       dockerfile: docker/Dockerfile.OrderService
     ports:
       - "5003:80"
     healthcheck:
-      test: ["CMD", "dotnet", "OrderService.API.dll", "check-health"]
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -105,6 +121,8 @@ services:
 networks:
   moducart-network:
     driver: bridge
+    attachable: true
+    name: moducart-network
 
 volumes:
   mongo-data:
