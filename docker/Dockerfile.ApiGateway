@@ -9,7 +9,6 @@ RUN dotnet restore "src/ApiGateway/OcelotApiGateway/OcelotApiGateway.csproj"
 # Copy everything else and build
 COPY . .
 WORKDIR "/src/src/ApiGateway/OcelotApiGateway"
-# RUN apt-get update && apt-get install -y wget
 RUN mkdir -p /app/keys && chmod 777 /app/keys
 RUN dotnet build "OcelotApiGateway.csproj" -c Release -o /app/build
 
@@ -21,5 +20,11 @@ EXPOSE 80
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
+
+# Install curl and SSL certificates (required for health checks)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+    
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "OcelotApiGateway.dll"]
