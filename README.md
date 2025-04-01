@@ -13,11 +13,11 @@ ModuCart is a **scalable, modular, and secure** e-commerce platform built using 
 
 ## 🏗️ Architecture
 
-📦 ModuCart.ApiGateway - API Gateway using Ocelot
-📦 ModuCart.Identity - Authentication & User Management
-📦 ModuCart.Products - Product Management Microservice
-📦 ModuCart.Orders - Order Processing Microservice
-📦 ModuCart.Payments - Secure Payment Microservice
+📦 ModuCart.ApiGateway - API Gateway using Ocelot  
+📦 ModuCart.Identity - Authentication & User Management  
+📦 ModuCart.Products - Product Management Microservice  
+📦 ModuCart.Orders - Order Processing Microservice  
+📦 ModuCart.Payments - Secure Payment Microservice  
 📦 ModuCart.SharedKernel - Shared libraries and utilities
 
 
