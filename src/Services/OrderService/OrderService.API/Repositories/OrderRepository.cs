@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using OrderService.API.Models;
-using OrderService.API.Settings;
+
+// using OrderService.API.Settings;
 
 namespace OrderService.API.Repositories
 {

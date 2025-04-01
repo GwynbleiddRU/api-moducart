@@ -1,19 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using PaymentService.API.DTOs;
-using PaymentService.API.Models;
-using PaymentService.API.Repositories;
+using OrderService.API.DTOs;
+using OrderService.API.Models;
+using OrderService.API.Repositories;
 
 namespace OrderService.API.Services
 {
     public class PaymentsService : IPaymentsService
     {
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly IPaymentsRepository _paymentRepository;
         private readonly ILogger<PaymentsService> _logger;
 
         public PaymentsService(
-            IPaymentRepository paymentRepository,
+            IPaymentsRepository paymentRepository,
             ILogger<PaymentsService> logger
         )
         {
@@ -31,12 +31,13 @@ namespace OrderService.API.Services
                     OrderId = request.OrderId,
                     UserId = request.UserId,
                     Amount = request.Amount,
+                    Currency = request.Currency,
                     PaymentMethod = request.PaymentMethod,
                     Status = "Processing",
                     CreatedAt = DateTime.UtcNow,
                 };
 
-                await _paymentRepository.AddPaymentAsync(payment);
+                await _paymentRepository.CreatePaymentAsync(payment);
 
                 // Simulating external payment processing
                 payment.Status = "Completed";

@@ -34,7 +34,10 @@ namespace OrderService.API
 
             // Product services
             //services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IPaymentsRepository, PaymentsRepository>();
+            services.AddScoped<IOrdersService, OrdersService>();
+            services.AddScoped<IPaymentsService, PaymentsService>();
             // services.AddScoped<ApplicationDbContext>(sp =>
             // {
             //     var client = sp.GetRequiredService<IMongoClient>();

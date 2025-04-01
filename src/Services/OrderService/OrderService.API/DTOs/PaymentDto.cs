@@ -1,12 +1,15 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace PaymentService.API.DTOs
+namespace OrderService.API.DTOs
 {
     public class PaymentRequestDto
     {
         [Required]
         public string OrderId { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
 
         [Required]
         public decimal Amount { get; set; }

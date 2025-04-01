@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using PaymentsService.API.Models;
-using PaymentsService.API.Settings;
+using OrderService.API.Models;
 
-namespace PaymentsService.API.Repositories
+// using OrderService.API.Settings;
+
+namespace OrderService.API.Repositories
 {
     public class PaymentsRepository : IPaymentsRepository
     {

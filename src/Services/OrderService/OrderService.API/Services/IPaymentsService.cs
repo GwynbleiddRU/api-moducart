@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using PaymentService.API.DTOs;
+using OrderService.API.DTOs;
 
 namespace OrderService.API.Services
 {

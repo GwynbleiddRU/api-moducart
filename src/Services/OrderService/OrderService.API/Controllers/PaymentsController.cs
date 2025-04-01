@@ -5,22 +5,22 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PaymentService.API.DTOs;
-using PaymentService.API.Services;
+using OrderService.API.DTOs;
+using OrderService.API.Services;
 
-namespace PaymentService.API.Controllers
+namespace OrderService.API.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("api/payments")]
     public class PaymentsController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
+        private readonly IPaymentsService _paymentService;
         private readonly IMapper _mapper;
         private readonly ILogger<PaymentsController> _logger;
 
         public PaymentsController(
-            IPaymentService paymentService,
+            IPaymentsService paymentService,
             IMapper mapper,
             ILogger<PaymentsController> logger
         )

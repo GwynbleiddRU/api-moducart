@@ -9,8 +9,8 @@ namespace OrderService.API.Repositories
     {
         Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
         Task<Order> GetOrderByIdAsync(string orderId);
-        Task<Order> AddOrderAsync(Order order);
-        Task<bool> UpdateOrderAsync(Order order);
+        Task<Order> CreateOrderAsync(Order order);
+        Task<bool> UpdateOrderStatusAsync(string orderId, string status);
         Task<bool> DeleteOrderAsync(string orderId);
     }
 }

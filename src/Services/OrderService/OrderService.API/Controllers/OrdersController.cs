@@ -12,9 +12,9 @@ namespace OrderService.API.Controllers
     [Route("api/orders")]
     public class OrdersController : ControllerBase
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrdersService _orderService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrdersService orderService)
         {
             _orderService = orderService;
         }
@@ -43,7 +43,7 @@ namespace OrderService.API.Controllers
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetUserOrders()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var orders = await _orderService.GetUserOrdersAsync(userId);
+            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
             return Ok(orders);
         }
     }

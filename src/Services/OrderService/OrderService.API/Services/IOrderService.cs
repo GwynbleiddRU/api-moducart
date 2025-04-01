@@ -1,8 +1,11 @@
+using OrderService.API.DTOs;
+using OrderService.API.Models;
+
 namespace OrderService.API.Services
 {
-    public interface IOrderService
+    public interface IOrdersService
     {
-        Task<Order> CreateOrderAsync(Order order);
+        Task<Order> CreateOrderAsync(string userId, CreateOrderDto orderDto);
         Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
         Task<Order> GetOrderByIdAsync(string orderId);
         Task<bool> UpdateOrderStatusAsync(string orderId, string status);
